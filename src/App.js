@@ -5,7 +5,6 @@ import { connect } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import styled from "styled-components";
-import { create } from "ipfs-http-client";
 
 export const StyledButton = styled.button`
   padding: 8px;
