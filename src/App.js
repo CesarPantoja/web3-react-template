@@ -1,25 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
-import { useDispatch, useSelector } from "react-redux";
-import { connect } from "./redux/blockchain/blockchainActions";
-import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
+
+
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 export const StyledButton = styled.button`
   padding: 8px;
 `;
 
 function App() {
-  const dispatch = useDispatch();
-  const blockchain = useSelector((state) => state.blockchain);
-  const data = useSelector((state) => state.data);
+  const blockchain = useStoreState(state => state.blockchain);
+  const connect = useStoreActions(actions => actions.blockchain.connect);
+  const mintDaito = useStoreActions(actions => actions.blockchain.mintDaito);
+  const canMintWithBushido = useStoreActions(actions => actions.blockchain.canMintWithBushido);
 
-  useEffect(() => {
-    if (blockchain.account !== "" && blockchain.smartContract !== null) {
-      dispatch(fetchData(blockchain.account));
-    }
-  }, [blockchain.smartContract, dispatch]);
+
+  const { register: registerMint, handleSubmit: handleSubmitMint } = useForm();
+  const { register: registerCheck, handleSubmit: handleSubmitCheck } = useForm();
+
+  const onSubmitCheck = (data) => console.log(data.bushidoId);
+  const onSubmitMint = (data) => console.log(data.bushidosId);
 
   return (
     <s.Screen>
@@ -27,10 +30,10 @@ function App() {
         <s.Container flex={1} ai={"center"} jc={"center"}>
           <s.TextTitle>Connect to the Blockchain</s.TextTitle>
           <s.SpacerSmall />
-          <StyledButton
+          <StyledButton className={"mint-option-generalcta w-button"}
             onClick={(e) => {
               e.preventDefault();
-              dispatch(connect());
+              connect();
             }}
           >
             CONNECT
@@ -43,8 +46,19 @@ function App() {
       ) : (
         <s.Container flex={1} ai={"center"} style={{ padding: 24 }}>
           <s.TextTitle style={{ textAlign: "center" }}>
-            Name: {data.name}.
+            Welcome {blockchain.account}
           </s.TextTitle>
+          <form onSubmit={handleSubmitCheck(onSubmitCheck)}>
+            <input {...registerCheck("bushidoId")} placeholder="Bushido id" />
+            <input type="submit" />
+          </form>
+          <form onSubmit={handleSubmitMint(onSubmitMint)}>
+            <input {...registerMint("bushidosId")} placeholder="Bushidos id" />
+            <input type="submit" />
+          </form>
+          {//  mintDaitos --> this will take an array of bushido ids
+            // canMintWithBusido --> user inputs a single bushiDo id and returns true or false
+          }
         </s.Container>
       )}
     </s.Screen>
